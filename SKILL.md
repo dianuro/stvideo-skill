@@ -1,7 +1,7 @@
 ---
 name: stvideo
 description: 从用户的一句话需求生成带解说与配音的完整讲解视频。流程：用户简述内容 -> 联网搜集资料并产出完整视频文案 -> 用户审阅确认 -> 生成讲解HTML与口播文稿(自动去AI味) -> 用户审阅确认(可改文稿文本文件) -> edge-tts配音、字幕叠加、录屏合成成片。当用户要求"做讲解视频/生成视频/把XX做成视频/视频生成/讲解动画/口播视频"时使用。
-version: 1.1.2
+version: 1.1.1
 allowed-tools:
   - Read
   - Write
@@ -75,24 +75,31 @@ allowed-tools:
 | `narration.json` | 每页 title / narration / duration_sec | 时间轴 |
 | `narration.md` | 人读的脚本 + 页/时间表 | 给用户看 |
 
-### 2.1 选择视觉模板（PPT 或平面 UI）
+### 2.1 生成讲解 HTML（严格遵循 science-content-ppt 流程）
 
-从内置模板中挑选最匹配的视觉风格，**无需用户指定时由模型自行判断**。
+本步骤完全按照内置的 **science-content-ppt** 工作流生成讲解 HTML，确保视觉风格、动画、图标都符合视频演示要求。
 
-- **默认 PPT 轮播模板**（优先从 `PPT Template-level2/` 选择，共 25 个；回退到 `PPT/` 目录）  
-- **平面 UI 流程图模板**（`Animation/` 目录，14 个，适合流程/架构/机制类内容）
+#### 2.1.1 选择视觉模板
 
-**选模板核心依据**（详细见 `references/templates/PPT Template-level2/SUMMARY.md` 与 `references/templates/Animation/SUMMARY.md`）：
-- **对比/辩论类** → 8-1、8-3、6-2  
-- **步骤/流程类** → 3-2、6-1、6-3、6-4（PPT）；RNN-3、RNN-4、Comprehension（平面UI）  
-- **案例/实验类** → 4-2、4-3  
-- **警示/危险类** → 5-4、7-3、The fatal flaw of DNN  
-- **轻量/快速** → 3-3、4-1、9-3  
-- **默认**：PPT 用 `PPT Template-level2/` 中综合适配的模板；平面UI 用 `Animation/RNN-3.html`。
+根据文案内容特点，从内置模板中选择最合适的视觉风格（**无需用户指定时由模型自行判断**）。
 
-### 2.2 生成 HTML（仿 PPT 轮播，含动画与图标）
+- **默认 PPT 轮播模板**：优先从 `assets/templates/PPT Template-level2/` 目录选择（共 25 个模板），回退到 `assets/templates/PPT/` 目录。
+- **平面 UI 流程图模板**：从 `assets/templates/Animation/` 目录选择（共 14 个模板），适合流程、架构、机制类内容。
 
-基于选定模板，使用以下提示词生成 `index.html`：
+**选模板核心依据**（详细参考 `references/templates/PPT Template-level2/SUMMARY.md` 和 `references/templates/Animation/SUMMARY.md`）：
+
+| 内容类型 | PPT 模板推荐 | 平面 UI 模板推荐 |
+|---------|-------------|-----------------|
+| 对比/辩论类 | 8-1、8-3、6-2 | — |
+| 步骤/流程类 | 3-2、6-1、6-3、6-4 | RNN-3、RNN-4、Comprehension |
+| 案例/实验类 | 4-2、4-3 | — |
+| 警示/危险类 | 5-4、7-3 | The fatal flaw of DNN |
+| 轻量/快速 | 3-3、4-1、9-3 | — |
+| 默认 | `PPT Template-level2/` 中综合适配的模板 | `Animation/RNN-3.html` |
+
+#### 2.1.2 生成 HTML
+
+使用以下提示词模板，结合 `script.md` 内容，生成完整的 `index.html`：
 
 ```
 基于下方讲解文案，生成基于纯前端页面单页布局仿 PPT 换页轮播进行直观图形化可视化的介绍。
@@ -100,8 +107,7 @@ allowed-tools:
 1. 加大字号，运用加粗、下划线、斜体、文字颜色、文字背景等强调方式，方便视频演示。
 2. 添加每次切换页面时页面中的各个元素依次"缓入"出现的动画效果(细化到每行文字)。
 3. 将emoji图标换成平面ui库的图标（如Font Awesome或Lucide图标库）。添加完成后检查页面中是否还有残留的emoji字符，如有则全部替换为对应的ui图标。
-4. 所有动画元素的 class 名统一使用 .an 或 .anim-item，并在页面底部加入 cloneNode 动画重置逻辑，
-   确保每次切换页面动画都会重新触发。
+4. 所有动画元素的 class 名统一使用 .an 或 .anim-item，并在页面底部加入 cloneNode 动画重置逻辑，确保每次切换页面动画都会重新触发。
 5. 每页用 <div class="slide" data-duration="秒数" data-narration="该页口播原文"> 标记。
 6. 代码量充足（建议 1000 行以上），视觉完整、布局饱满。
 ---
@@ -109,9 +115,10 @@ allowed-tools:
 ---
 ```
 
-**必做检查**：
-- 生成后确认无 emoji 残留。
-- 确认包含动画重置 JS（若模板缺失，手动添加）：
+**生成后必须执行以下检查：**
+
+- **Emoji 检查**：确保页面中无任何 emoji 字符残留，全部替换为 Font Awesome 或 Lucide 图标。
+- **动画重置 JS**：检查页面底部是否包含以下代码；若缺失，手动添加（确保在 `</body>` 前）：
 
 ```javascript
 (function() {
@@ -124,7 +131,18 @@ allowed-tools:
 })();
 ```
 
-### 2.3 注入录制契约
+#### 2.1.3 可选：重构为 PPT 模板风格
+
+如果初次生成的 HTML 视觉风格不够理想，可以按选定模板重构：
+
+```
+以页面 {模板相对路径} 为模板重构 {输出路径}。
+请将当前 HTML 的内容按照指定模板的布局、样式和轮播机制进行重构，保持科普内容不变，优化视觉效果使其更适合视频演示。
+```
+
+重构后仍需保留 `.slide` + `data-narration` + `data-duration` 约束，并检查动画重置 JS。
+
+#### 2.1.4 注入录制契约
 
 生成/重构完成后，运行脚本自动注入 `window.deckAPI`、录制模式 CSS 和字幕安全区：
 
@@ -132,7 +150,7 @@ allowed-tools:
 python3 scripts/inject_deck_api.py presentations/<slug>/index.html --aspect 16:9
 ```
 
-### 2.4 生成口播文稿并去 AI 味
+### 2.2 生成口播文稿并去 AI 味
 
 为每一页写 `data-narration`：**口语化、短句、一到两句/页**，念出来正好对应 `data-duration`。写完后**必须跑一遍"去AI味"**（附录 A 的规则），尤其口语视频最容易出现的：排比三连、emoji 点缀、破折号堆叠、客服式讨好、公式化结尾。去 AI 味只改文字自然度，**不要改事实与数据**。
 
@@ -196,7 +214,6 @@ python3 $S/fetch_font.py --list-system                  # 看本机装了哪些�
 
 opt-in 下载（用户已同意才用）：
 ```bash
-S=<skill根目录>/scripts
 bash $S/build_video.sh presentations/<slug> --allow-fetch        # 下载默认 lxgw-medium
 python3 $S/fetch_font.py --download --font lxgw-light            # 细一档的霞鹜文楷
 python3 $S/fetch_font.py --url https://…/X.ttf                   # 任意字体
@@ -223,6 +240,64 @@ python3 $S/fetch_font.py --list                                  # 可下载预�
 - `ffprobe final/<slug>.mp4`：视频应从 0 开始，默认 1920×1080 / 30fps（或指定竖屏 1080×1920），音视频时长差 ≤ 1 帧。
 - 抽查首帧、封面后第一帧、各页切换处、字幕相对底部安全区（横屏 70px / 竖屏 240px）的位置。
 - 用户改过 `narration.txt` 后，必须让 SRT/录屏/字幕/成片全部失效重跑，不能复用旧产物。
+
+---
+
+## 环境准备与依赖
+
+### Python 虚拟环境（.venv）
+
+**所有 Python 依赖必须安装在项目内的 `.venv` 虚拟环境中**，避免污染系统 Python 环境。
+
+创建并激活虚拟环境：
+
+```bash
+cd <skill根目录>          # 进入 skill 根目录
+python3 -m venv .venv     # 创建虚拟环境
+source .venv/bin/activate # 激活（Linux/macOS）
+# Windows 使用：.venv\Scripts\activate
+```
+
+之后所有 `pip install` 和 `python` 命令都在该虚拟环境下执行。
+
+### 依赖安装
+
+```bash
+# 激活虚拟环境后执行
+pip install edge-tts playwright pillow
+python -m playwright install chromium
+# 可选：字体精确检测
+pip install fonttools
+```
+
+### 国内镜像源（可选，但推荐）
+
+如果在中国大陆，下载 Python 包时建议切换到国内镜像源以加速。常用镜像源：
+
+- 清华：`https://pypi.tuna.tsinghua.edu.cn/simple`
+- 阿里云：`https://mirrors.aliyun.com/pypi/simple/`
+- 中科大：`https://pypi.mirrors.ustc.edu.cn/simple/`
+
+使用方法（临时指定）：
+
+```bash
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple edge-tts playwright pillow
+```
+
+或者永久配置（写入 `~/.pip/pip.conf` 或 `~/.config/pip/pip.conf`）：
+
+```ini
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+Playwright 浏览器下载也可以使用镜像：
+
+```bash
+PLAYWRIGHT_DOWNLOAD_HOST=https://npmmirror.com/mirrors/playwright python -m playwright install chromium
+```
+
+**注意**：edge-tts 的 TTS 服务仍需要联网到 Microsoft 端点，镜像只加速 Python 包安装。
 
 ---
 
