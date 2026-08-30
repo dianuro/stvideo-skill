@@ -111,6 +111,7 @@ allowed-tools:
 5. 每页用 <div class="slide" data-duration="秒数" data-narration="该页口播原文"> 标记。
 6. 代码量充足（建议 1000 行以上），视觉完整、布局饱满。
 7. 支持方向键左右键切换画面，方便用户预览内容。
+8. 不要尝试绘制复杂的人物图形。
 ---
 {script.md 的完整内容}
 ---
