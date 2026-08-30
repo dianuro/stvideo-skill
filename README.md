@@ -25,6 +25,8 @@
 - Python 包：`edge-tts`、`playwright`、`pillow`（可选 `fonttools` 用于精确中文检测）
 - 中文字体（由用户提供或系统自带）
 
+# 说明
+
 该Skill实际是通过整合，借鉴了其他几个Skill的功能实现的，分别是：
 
 - science-content-ppt - 生成html演示 (https://github.com/Unclecheng-li/AI_Animation)
