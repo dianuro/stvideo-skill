@@ -83,8 +83,8 @@ allowed-tools:
 
 根据文案内容特点，从内置模板中选择最合适的视觉风格（**无需用户指定时由模型自行判断**）。
 
-- **默认 PPT 轮播模板**：优先从 `assets/templates/PPT Template-level2/` 目录选择（共 25 个模板），回退到 `assets/templates/PPT/` 目录。
-- **平面 UI 流程图模板**：从 `assets/templates/Animation/` 目录选择（共 14 个模板），适合流程、架构、机制类内容。
+- **默认 PPT 轮播模板**：优先从 `references/templates/PPT Template-level2/` 目录选择（共 25 个模板），回退到 `references/templates/PPT/` 目录。
+- **平面 UI 流程图模板**：从 `references/templates/Animation/` 目录选择（共 14 个模板），适合流程、架构、机制类内容。
 
 **选模板核心依据**（详细参考 `references/templates/PPT Template-level2/SUMMARY.md` 和 `references/templates/Animation/SUMMARY.md`）：
 
@@ -214,6 +214,7 @@ python3 $S/fetch_font.py --list-system                  # 看本机装了哪些�
 
 opt-in 下载（用户已同意才用）：
 ```bash
+S=<skill根目录>/scripts
 bash $S/build_video.sh presentations/<slug> --allow-fetch        # 下载默认 lxgw-medium
 python3 $S/fetch_font.py --download --font lxgw-light            # 细一档的霞鹜文楷
 python3 $S/fetch_font.py --url https://…/X.ttf                   # 任意字体
