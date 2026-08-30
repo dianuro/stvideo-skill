@@ -110,6 +110,7 @@ allowed-tools:
 4. 所有动画元素的 class 名统一使用 .an 或 .anim-item，并在页面底部加入 cloneNode 动画重置逻辑，确保每次切换页面动画都会重新触发。
 5. 每页用 <div class="slide" data-duration="秒数" data-narration="该页口播原文"> 标记。
 6. 代码量充足（建议 1000 行以上），视觉完整、布局饱满。
+7. 支持方向键左右键切换画面，方便用户预览内容。
 ---
 {script.md 的完整内容}
 ---
