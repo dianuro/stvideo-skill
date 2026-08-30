@@ -36,5 +36,3 @@
 # 效果预览
 
 我自己的效果较好的案例(https://www.bilibili.com/video/BV1A84m6GErs)
-
-<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=117180381272799&bvid=BV1A84m6GErs&cid=41409184926&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
