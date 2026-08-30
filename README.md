@@ -30,5 +30,5 @@
 该Skill实际是通过整合，借鉴了其他几个Skill的功能实现的，分别是：
 
 - science-content-ppt - 生成html演示 (https://github.com/Unclecheng-li/AI_Animation)
-- humanhumanizer - 减少文案的AI味 (https://www.bilibili.com/video/BV1uQ8E6LE6G)
+- humanizer - 减少文案的AI味 (https://www.bilibili.com/video/BV1uQ8E6LE6G)
 - bbshare-video - 把一个概念做成一条带旁白的讲解视频 (https://github.com/bbshare/bbshare-skills)
